@@ -1146,7 +1146,7 @@ function QuestManager.StartQuest(QuestId, QuestLevel)
     
 end
 
-local RawMobRegions = game:HttpGet("https://raw.githubusercontent.com/Dev-Ztxyeuem/Kaitunontop/refs/heads/main/hello1.json") 
+local RawMobRegions = game:HttpGet("https://raw.githubusercontent.com/Kainokloveyoulearnlua/Rbloxkid/refs/heads/main/hello1.json") 
 
  ScriptStorage.MobRegions = {} 
 print(RawMobRegions)
