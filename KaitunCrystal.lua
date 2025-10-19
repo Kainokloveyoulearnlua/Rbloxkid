@@ -33,7 +33,6 @@ getgenv().Crystal = {
          },
      ["Player"] = {
         ["Upgrade RaceV2-V3"] = true,
-        ["RaceV2"]= true,
         ["Pull Lever"] = true
         },
      ["Hop Server"] = {
@@ -44,6 +43,7 @@ getgenv().Crystal = {
          ["Lock Fragments"] = 15000,
           },
       ["Settings"] = {
+        ["Get Mirror Fracal if have God Chalice"] = true,
         ["In Sea2 Until DarkFragments"] = false,
         ["Farm Bones get x2Exp"] = false,
         ["FpsBoost"] = true,
@@ -183,9 +183,9 @@ StartTime = os.time()
     
     StartTick = tick()
     alert("load 2")
-    -- loadstring(game:HttpGet"https://github.com/Cyndral-World/Cyndral_BF/blob/main/InstanceDownloader.lua?raw=true")()
+    -- 
     
-    local FolderPath = "Rua_Hub/Blox_Fruit/Assets/"
+    local FolderPath = "Crystal/Blox_Fruit/Assets/"
     
     
     ScriptStorage = {
@@ -429,6 +429,9 @@ end
 MeleeCheck(LocalPlayer.Character:FindFirstChildOfClass("Tool"))
     
     RefreshPlayerData()
+
+
+
     function RegisterLocalPlayerEventsConnection()
     
         task.spawn(function()
@@ -618,7 +621,7 @@ MeleePrices = {
     {
         Price = 
         {
-            Beli = 2500000, 
+            Beli = 3000000, 
             Fragments = 5000
         }, 
         NextLevelRequirement = 400, 
@@ -832,8 +835,8 @@ BossesOrder = {
     "Cake Prince"
 }
 BossesOrderLevel = {
-    ["Awakened Ice Admiral"] = 700, 
-    ["Tide Keeper"] = 700, 
+    ["Awakened Ice Admiral"] = 1500, 
+    ["Tide Keeper"] = 1500, 
     ["Deandre"] = 1500,
     ["Urban"] = 1500,
     ["Diablo"] = 1500,
@@ -1064,7 +1067,7 @@ end
 function QuestManager.RefreshQuest(Self) 
     
     while not ScriptStorage.PlayerData.Level  do 
-        task.wait(1)
+        task.wait()
         print("[ Debug ] Waiting for LocalPlayer datas.")
     end 
     
@@ -1146,7 +1149,7 @@ function QuestManager.StartQuest(QuestId, QuestLevel)
     
 end
 
-local RawMobRegions = game:HttpGet("https://raw.githubusercontent.com/Kainokloveyoulearnlua/Rbloxkid/refs/heads/main/hello1.json") 
+local RawMobRegions = game:HttpGet("https://raw.githubusercontent.com/Kainokloveyoulearnlua/Rbloxkid/refs/heads/main/Waitspwan%20mob.lua") 
 
  ScriptStorage.MobRegions = {} 
 print(RawMobRegions)
@@ -1177,7 +1180,7 @@ function TweenController.Update()
     
     HumanoidRootPart = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart") 
     
-    if CaculateDistance(Part.CFrame) > 500 then
+    if CaculateDistance(Part.CFrame) > 350 then
         pcall(function() 
             TweenInstance:Cancel()
         end) 
@@ -1193,131 +1196,102 @@ function TweenController.Update()
 end
 
 
-
 function GetPortal(Position) 
-    local Nearest, Current = math.huge, nil
-    local RootPart = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-    if not RootPart then return end
-
-    local RootPos = RootPart.Position
-    local RootDist = CaculateDistance(RootPos, Position)
-
-    for _, Portal in pairs(Portals) do
+    local Nearest, Current = 9e9, nil
+    for _, Portal in Portals do
         local Dist1 = CaculateDistance(Portal, Position)
-        
-        if Dist1 and Dist1 < (RootDist - 300) and Dist1 < Nearest then 
+        if Dist1 < ( CaculateDistance(Position)-300 ) and Dist1 < Nearest then 
             Nearest = Dist1 
             Current = Portal
+            
         end 
     end 
     
     if Current then 
-        pcall(function()
-            Remotes.CommF_:InvokeServer("requestEntrance", Current)
-        end)
-        task.wait(0.5)
-        return
+        Remotes.CommF_:InvokeServer("requestEntrance", Current)
+        return task.wait(0.5)
     end 
 end 
 
-
 function GetEntries(Position) 
-    local Nearest, Current = math.huge, nil
-    local RootPart = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-    if not RootPart then return end
-
-    local RootPos = RootPart.Position
-    local RootDist = CaculateDistance(RootPos, Position)
-
-    for _, Entry in pairs(Entries) do
+    local Nearest, Current = 9e9, nil
+    for _, Entry in Entries do
         local Dist1 = CaculateDistance(Entry, Position)
-        if Dist1 and Dist1 < (RootDist - 700) and Dist1 < Nearest then 
+        if Dist1 < ( CaculateDistance(Position) - 700 ) and Dist1 < Nearest then 
             Nearest = Dist1 
             Current = Entry
+            
         end 
     end 
     
     if Current then 
-        if os.time() - (LastestTeleportToHomePoint or 0) > 30 then 
-            
-            for _ = 1,10 do task.wait() end 
+        if os.time() - LastestTeleportToHomePoint > 30 then 
+            for i=1,10,1 do 
+                task.wait() 
+                
+            end 
         end 
     end 
 end 
 
 
 function TweenController.Tween2(ePart, Position) 
-    if not ePart or not Position then return end
-    local distance = CaculateDistance(ePart.CFrame, Position)
-    if not distance then return end
-
-    
-    local target = typeof(Position) == "CFrame" and Position or CFrame.new(Position)
     TweenInstance2 = Services.TweenService:Create(
-        ePart,
-        TweenInfo.new(distance / 50, Enum.EasingStyle.Linear),
-        {CFrame = target}
-    )
-    pcall(function() TweenInstance2:Play() end)
+            ePart,
+            TweenInfo.new(CaculateDistance(ePart.CFrame, Position) / 50, Enum.EasingStyle.Linear),
+            {CFrame = ConvertTo(CFrame, Position)-Vector3.new(0,0,0)}
+        )
+    TweenInstance2:Play()
 end
 
-
 function TweenController.Create(Position)
+    
+    
     if not Position or TweenDebounce then return end 
-    
-    local Character = game.Players.LocalPlayer.Character
-    if not Character then return end 
-    local hrp = Character:FindFirstChild("HumanoidRootPart")
-    if not hrp then return end 
-
-    local targetCFrame = typeof(Position) == "CFrame" and Position or CFrame.new(Position)
-    
+    local Position = typeof(Position) ~= "CFrame" and ConvertTo(CFrame, Position) or Position
+     
+     
     if TweenInstance then 
-        pcall(function() TweenInstance:Cancel() end)
+        pcall(function() 
+            TweenInstance:Cancel() 
+        end)
     end 
     
-    
-    for _, part in ipairs(Character:GetDescendants()) do
+    for _, part in ipairs(game.Players.LocalPlayer.Character:GetDescendants()) do
         if part:IsA("BasePart") then
             part.CanCollide = false
         end
     end
-
-    local head = Character:FindFirstChild("Head")
-    if head and not head:FindFirstChild("eltrul") then
-        local bv = Instance.new("BodyVelocity")
-        bv.Name = "eltrul"
-        bv.MaxForce = Vector3.new(0, math.huge, 0)
-        bv.Velocity = Vector3.zero
-        bv.Parent = head
+    local head = game.Players.LocalPlayer.Character:WaitForChild("Head")
+    if not head:FindFirstChild("eltrul") then
+        local bodyVelocity = Instance.new("BodyVelocity")
+        bodyVelocity.Name = "eltrul"
+        bodyVelocity.MaxForce = Vector3.new(0, math.huge, 0)
+        bodyVelocity.Velocity = Vector3.zero
+        bodyVelocity.Parent = head
     end
    
-    
-    local dist = CaculateDistance(hrp.Position, targetCFrame.Position)
-    if dist > 500 then 
+   if CaculateDistance(Position) > 500 then 
         if SeaIndex == 3 and not ScriptStorage.Backpack["Valkyrie Helm"] then 
-            -- giữ nguyên: không làm gì
         elseif SeaIndex ~= 3 then 
-            GetPortal(Position)
+            GetPortal(Position) 
         end 
-    end 
       
+   end 
     
-    local playerpos = hrp.CFrame 
-    hrp.CFrame = CFrame.new(playerpos.X, targetCFrame.Y, playerpos.Z)
-
+        --TweenController.Update()
+    
+    Position = CFrame.new(Position.Position)
+    
+    local Dist = CaculateDistance(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame, Position)
+    local playerpos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame 
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(playerpos.x, Position.y, playerpos.z)
     TweenInstance = Services.TweenService:Create(
-        hrp,
-        TweenInfo.new(dist / 350, Enum.EasingStyle.Linear),
-        {CFrame = CFrame.new(targetCFrame.Position)}
-    ) 
-
-    TweenInstance.Completed:Connect(function()
-        TweenDebounce = false
-    end)
-
-    TweenDebounce = true
-    pcall(function() TweenInstance:Play() end)
+            game.Players.LocalPlayer.Character.HumanoidRootPart,
+            TweenInfo.new(Dist / 350 , Enum.EasingStyle.Linear),
+            {CFrame = Position}
+        ) 
+    TweenInstance:Play()
 end
 
 
@@ -1908,7 +1882,7 @@ function CombatController.Attack(MobTable, NearbyHit, Range, Callback)
                 return 
             end
             
-        getgenv().ContentSet("LevelFarm", "Waiting mobs...")
+        
             local CurrentPosition
             
             if not Region[CombatController.CurrentIndex] then 
@@ -1923,9 +1897,9 @@ function CombatController.Attack(MobTable, NearbyHit, Range, Callback)
               
                 
         
-        TweenController.Create(CurrentPosition+Vector3.new(0,35,35))
+        TweenController.Create(CurrentPosition+Vector3.new(0,0,0))
         task.wait()
-        if CaculateDistance(CurrentPosition+ Vector3.new(0,35,35)) < 15 then
+        if CaculateDistance(CurrentPosition+ Vector3.new(0,0,0)) < 15 then
             
                 CombatController.CurrentIndex = CombatController.CurrentIndex + 1
             end
@@ -2291,7 +2265,7 @@ FunctionsHandler.LevelFarm:RegisterMethod("Start", function(Level)
         end
     end 
     
-    if ScriptStorage.Tools["God's Chalice"] and not ScriptStorage.Tools["Mirror Fractal"] then 
+    if getgenv().Crystal["Settings"]["Get Mirror Fracal if have God Chalice"] and ScriptStorage.Tools["God's Chalice"] and not ScriptStorage.Tools["Mirror Fractal"] then 
         if (ScriptStorage.Backpack["Conjured Cocoa"] or {Count = 0}).Count < 10 then
             CombatController.Attack({"Cocoa Warrior", "Chocolate Bar Battler"}) 
             return 
@@ -2429,7 +2403,7 @@ FunctionsHandler.LevelFarm:RegisterMethod("Start", function(Level)
             if not NpcPosition then 
                 return QuestManager:RefreshQuest() and Report("failed to get npc position quest 528")
             end 
-             ContentSet("Level Farming | " .. MonName .. " | Claiming Quest") TweenController.Create(NpcPosition + Vector3.new(0,5,3)) 
+             TweenController.Create(NpcPosition + Vector3.new(0,5,3)) 
             
             if CaculateDistance(NpcPosition) > 10 then 
                 return 
@@ -2672,9 +2646,9 @@ FunctionsHandler.MeleesController:RegisterMethod("Start", function()
         Data = MeleePrices[Melee]
             if not Data then 
                 print("no m1 data")
-                break 
+                
             end
-            
+         
             if Melee == "Dragon Talon" then 
                 IsFireEssenceGave = (function()
                     if IsFireEssenceGave ~= nil then
@@ -2693,6 +2667,10 @@ FunctionsHandler.MeleesController:RegisterMethod("Start", function()
                     break 
                 end 
             end 
+
+
+
+
             if Melee == "Godhuman" and not GodHumanFlag then 
                 
                 if (ScriptStorage.Melees["Dragon Talon"] or 0) > 399 then
@@ -2722,19 +2700,21 @@ FunctionsHandler.MeleesController:RegisterMethod("Start", function()
                     
                     return print("[ Debug ] Failed to get melee id of", Melee) 
                 end 
-                
-                MSet = false 
+               
+        
+if (ScriptStorage.Melees[Melee] or 0) >= 400 then
+                            Mset = false
                 for Index, Value in Data.Price do 
                     if PlayerData[Index] < Value then 
                         ValuementPassed = false 
-                                    
-                            if not ScriptStorage.Melees[Melee] then 
-                                MSet = true
-                                
+                           if not ScriptStorage.Melees[Melee] then
+                            Mset = true
                             end
                         return
                     end
                 end 
+               end 
+  
                 
                 if not MSet and ScriptStorage.Melees[Melee] and ScriptStorage.Melees[Melee] < Data.NextLevelRequirement then 
                     
@@ -2763,7 +2743,7 @@ FunctionsHandler.MeleesController:RegisterMethod("Start", function()
                         
                         task.wait()
                         if not ScriptStorage.Tools[Melee] then 
-                            if ( Melee == "Death Step" or Melee == "Sharkman Karate" ) and SeaIndex ~= 2 then
+                            if ( Melee == "Death Step" or Melee == "Sharkman Karate" ) and SeaIndex ~= 2 and SeaIndex ~= 1 then 
                             
                                 alert("Go Back To Second Sea", "Water Key / Library Key")
                                 Remotes.CommF_:InvokeServer("TravelDressrosa")
@@ -3210,6 +3190,8 @@ FunctionsHandler.RaidController:RegisterMethod("Start", function()
     end
 end)
 
+
+
 -- CollectDrops
 
 FunctionsHandler.CollectDrops:RegisterMethod('Refresh', function() 
@@ -3238,9 +3220,6 @@ FunctionsHandler.CollectDrops:RegisterMethod('Start', function()
     end 
 end)
 
-
-
-
 FunctionsHandler.UtillyItemsActivitation:RegisterMethod("Refresh", function()
     
     if os.time() - StartTime < 20 then return end 
@@ -3264,17 +3243,37 @@ FunctionsHandler.UtillyItemsActivitation:RegisterMethod("Refresh", function()
             
             table.insert(RemoveList, "Awakened Ice Admiral") 
         end 
+          
+    
+local Response = not ScriptStorage.Melees["Sharkman Karate"]
+    and Remotes.CommF_:InvokeServer("BuySharkmanKarate", true)
+
+if typeof(Response) == "string" then
+    
+    TidePassed = true
+    table.insert(RemoveList, "Tide Keeper")
+else
+    if SeaIndex == 2 and ScriptStorage.PlayerData.Level >= 1500 then
+        BossesOrderLevel["Tide Keeper"] = 1500
         
-        local Response = not ScriptStorage.Melees["Sharkman Karate"] and Remotes.CommF_:InvokeServer("BuySharkmanKarate", true); 
+        if not table.find(BossesOrder, "Tide Keeper") then
+            table.insert(BossesOrder, "Tide Keeper")
+        end
+
         
-        SharkmanPassed = typeof(Response) == "string"
-     --   alert("SharkmanPassed", SharkmanPassed)
-        if typeof(Response) == "string" then
-            table.insert(SpecialItems, "Water Key") 
-        else 
-            TidePassed = true
-            table.insert(RemoveList, "Tide Keeper")
-        end 
+        if not ScriptStorage.Enemies["Tide Keeper"] then
+             task.wait(1)
+            Hop("Hop for Tide Keeper")
+        end
+    else
+        
+        TidePassed = true
+        table.insert(RemoveList, "Tide Keeper")
+    end
+end
+
+
+
         
         if ScriptStorage.Backpack.Yama then 
             print("Elite")
@@ -3327,10 +3326,9 @@ FunctionsHandler.UtillyItemsActivitation:RegisterMethod("Refresh", function()
             end 
         end 
         if FunctionsHandler.Trevor:Get("IsCompleted") and not Storage:Get("SwanDefeated") then
-            print("Added Don Swan to boss orser list")
+            
             BossesOrderLevel["Don Swan"] = 1100 
             table.insert(BossesOrder, "Don Swan")
-            print(ScriptStorage.PlayerData.Level, ScriptStorage.Enemies["Don Swan"])
             if SeaIndex == 2 and ScriptStorage.PlayerData.Level > 1500 and not ScriptStorage.Enemies["Don Swan"] then 
                  
                 print("hop")
@@ -3351,7 +3349,7 @@ FunctionsHandler.UtillyItemsActivitation:RegisterMethod("Refresh", function()
 
 
 
-if SeaIndex == 3 and ( ScriptStorage.Melees["Death Step"] or 0 ) >= 400 and ( ScriptStorage.Melees["Black Leg"] or 0 ) >= 400 and ScriptStorage.PlayerData.Beli >= 2500000 and ScriptStorage.PlayerData.Fragments >= 5000 and not ScriptStorage.Melees["Electric Claw"] then 
+if SeaIndex == 3 and ( ScriptStorage.Melees["Death Step"] or 0 ) >= 400 and ( ScriptStorage.Melees["Sharkman Karate"] or 0 ) >= 400 and ScriptStorage.PlayerData.Beli >= 3000000 and ScriptStorage.PlayerData.Fragments >= 5000 and not ScriptStorage.Melees["Electric Claw"] then 
         FunctionsHandler.UtillyItemsActivitation:Set("CurrentProgressLevel", "Previous Hero")
         return "Previous Hero"
     end 
@@ -3365,6 +3363,15 @@ if SeaIndex == 3 and ( ScriptStorage.Melees["Death Step"] or 0 ) >= 400 and ( Sc
         FunctionsHandler.UtillyItemsActivitation:Set("CurrentProgressLevel", "Soul Reaper Spawner")
         return "Soul Reaper Spawner"
     end 
+
+
+    if SeaIndex == 3 and not  IsFireEssenceGave and ScriptStorage.PlayerData.Level >= 1500  and ( ScriptStorage.Backpack.Bones or { Count = 0 } ).Count < 500 then 
+    
+    FunctionsHandler.UtillyItemsActivitation:Set("CurrentProgressLevel", "Find Fire Essence")
+        
+        return "Find Fire Essence"
+    end 
+
     
     if ScriptStorage.Tools["Fire Essence"] then 
         FunctionsHandler.LocalPlayerController.Methods.EquipTool:Call("Fire Essence")
@@ -3399,6 +3406,16 @@ FunctionsHandler.UtillyItemsActivitation:RegisterMethod("Start", function()
         
         Remotes.CommF_:InvokeServer("BuyElectricClaw")
         FunctionsHandler.LocalPlayerController.Methods.EquipTool:Call("Melee")
+
+     elseif Type == "Find Fire Essence" then
+        CombatController.Attack({
+            "Reborn Skeleton",
+            "Living Zombie",
+            "Demonic Soul",
+            "Posessed Mummy"
+        })
+        return 
+
     elseif Type == "Uzoth" then 
         
         print("Use Fire Essence")
@@ -3419,7 +3436,6 @@ FunctionsHandler.UtillyItemsActivitation:RegisterMethod("Start", function()
     
     SpecialItems = nil
 end)
-
 
 -- Trevor 
 
@@ -3612,8 +3628,9 @@ FunctionsHandler.SoulGuitar:RegisterMethod("Refresh", function()
     if not SoulGuitarProcess then  
       Remotes.CommF_:InvokeServer("gravestoneEvent", 2)
         if not CheckFullMoon() then 
-            
-            Hop("Full Moon / SG")
+             
+            HopApi("fullmoon")
+          task.wait(1)
         end 
         return 7
     end 
@@ -4273,6 +4290,81 @@ Hop = function(Reason, PlayerLimit)
         return alert("Serverhop", "Couldn't find a server.")
     end    
 end 
+
+
+local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local TrollApi = loadstring(game:HttpGet("https://raw.githubusercontent.com/PorryDepTrai/exploit/main/SimpleTroll.lua"))()
+
+local function decode(job)
+    return TrollApi["Decode JobId API Porry | discord.gg/umaru | MB KHOI"](job, "discord.gg/umaru | MB_Bank 9929992999 Phan Dat Khoi")
+end
+
+local function scrapeAPI(API)
+    local success, response = pcall(function()
+        return request({
+            Url = API,
+            Method = "GET"
+        })
+    end)
+
+    if success and response.Success then
+        local data = HttpService:JSONDecode(response.Body)
+
+        if data.Amount and data.Amount > 0 then
+            local jobIds = {}
+
+            for _, job in ipairs(data.JobId) do
+                for jobId, _ in pairs(job) do
+                    table.insert(jobIds, jobId)
+                end
+            end
+            
+            return jobIds
+        end
+    end
+    
+    return nil
+end
+
+-- Hop Api
+
+local function HopApi(apiEndpoint)
+    local jobIds = scrapeAPI("https://hostserver.porry.store/bloxfruit/bot/JobId/" .. apiEndpoint)
+    if not jobIds then return end
+
+    for _, jobId in ipairs(jobIds) do
+        ReplicatedStorage.__ServerBrowser:InvokeServer("teleport", decode(jobId))
+        wait()
+    end
+end
+
+local function hopFullMoon()
+    HopApi("fullmoon")
+end
+
+local function hopChim()
+    HopApi("conchimkicuc") 
+end
+
+local function hopRipIndra()
+    HopApi("indra")
+end
+
+local function hopDoughKing()
+    HopApi("doughking")
+end
+
+local function hopMirage()
+    HopApi("mirage")
+end
+
+local function hopDarkBread()
+    hopapi("darkbread")
+end
+
 
 
 Storage = {
